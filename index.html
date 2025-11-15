@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GymMaster - Gestor de Academia</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏋️</text></svg>">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <!-- Tela de Login -->
+    <div id="login-screen" class="login-container">
+        <h1 class="login-title">🏋️ GymMaster - Login</h1>
+        <div id="login-alert" class="alert hidden"></div>
+        
+        <div id="first-access-info" class="alert alert-info hidden">
+            <p><strong>👋 Primeiro acesso!</strong> Cadastre-se para criar sua conta.</p>
+        </div>
+        
+        <div id="login-form">
+            <div class="form-group">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" placeholder="seu@email.com">
+            </div>
+            <div class="form-group">
+                <label for="login-password">Senha</label>
+                <input type="password" id="login-password" placeholder="Sua senha">
+            </div>
+            <button id="login-btn" class="btn btn-primary" style="width: 100%;">🚀 Entrar</button>
+        </div>
+        
+        <div id="register-form" class="hidden">
+            <div class="form-group">
+                <label for="register-name">Nome Completo*</label>
+                <input type="text" id="register-name" placeholder="Seu nome completo">
+            </div>
+            <div class="form-group">
+                <label for="register-email">Email*</label>
+                <input type="email" id="register-email" placeholder="seu@email.com">
+            </div>
+            <div class="form-group">
+                <label for="register-phone">Telefone</label>
+                <input type="text" id="register-phone" placeholder="(XX) XXXXX-XXXX">
+            </div>
+            <div class="form-group">
+                <label for="register-password">Senha*</label>
+                <input type="password" id="register-password" placeholder="Crie uma senha forte">
+            </div>
+            <div class="form-group">
+                <label for="register-confirm-password">Confirmar Senha*</label>
+                <input type="password" id="register-confirm-password" placeholder="Digite a senha novamente">
+            </div>
+            <button id="register-btn" class="btn btn-primary" style="width: 100%;">👑 Criar Conta Admin</button>
+            <button id="back-to-login" class="btn btn-secondary" style="width: 100%; margin-top: 10px;">← Voltar para Login</button>
+        </div>
+    </div>
+
+    <!-- Aplicação Principal -->
+    <div id="main-app" class="container hidden">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar">
+            <h2>🏋️ GymMaster</h2>
+            <div id="user-info" class="card" style="background: rgba(255,255,255,0.1); margin-top: 20px;">
+                <p id="user-name">👤 Nome do Usuário</p>
+            </div>
+            
+            <div id="notifications" style="margin-top: 20px;">
+                <h3>🔔 Notificações</h3>
+                <div id="notifications-list"></div>
+            </div>
+            
+            <nav style="margin-top: 30px;">
+                <ul style="list-style: none;">
+                    <li><a href="#" class="nav-link" data-page="dashboard">📊 Dashboard</a></li>
+                    <li><a href="#" class="nav-link" data-page="cadastro-atleta">➕ Cadastrar Atleta</a></li>
+                    <li><a href="#" class="nav-link" data-page="lista-atletas">👥 Listar Atletas</a></li>
+                    <li><a href="#" class="nav-link" data-page="pagamentos">💰 Pagamentos</a></li>
+                    <li><a href="#" class="nav-link" data-page="relatorios">📊 Relatórios</a></li>
+                    <li><a href="#" class="nav-link" data-page="configuracoes">⚙️ Configurações</a></li>
+                    <li><a href="#" class="nav-link" data-page="perfil">👤 Perfil</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div class="main-content">
+            <div class="header">
+                <button id="menu-toggle" class="menu-toggle">☰</button>
+                <h1 id="page-title">Dashboard</h1>
+            </div>
+
+            <!-- Páginas -->
+            <div id="dashboard-page" class="page active">
+                <div class="kpi-container">
+                    <div class="kpi-card">
+                        <div class="kpi-label">💰 Receita Mensal</div>
+                        <div class="kpi-value" id="kpi-receita">KZ 0,00</div>
+                        <div id="kpi-meta">0% da meta</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">👥 Atletas Ativos</div>
+                        <div class="kpi-value" id="kpi-ativos">0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">⚠️ Em Alerta</div>
+                        <div class="kpi-value" id="kpi-alertas">0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">💵 Ticket Médio</div>
+                        <div class="kpi-value" id="kpi-ticket">KZ 0,00</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">📊 Receita dos Últimos 6 Meses</div>
+                    <div id="chart-container">
+                        <canvas id="revenue-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div id="cadastro-atleta-page" class="page hidden">
+                <div class="card">
+                    <div class="card-header">➕ Cadastrar Novo Atleta</div>
+                    <form id="form-cadastro-atleta">
+                        <div class="form-group">
+                            <label for="atleta-nome">Nome Completo*</label>
+                            <input type="text" id="atleta-nome" placeholder="Ex: João Silva" required>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="atleta-telefone">Telefone</label>
+                                    <input type="text" id="atleta-telefone" placeholder="(XX) XXXXX-XXXX">
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="atleta-email">Email</label>
+                                    <input type="email" id="atleta-email" placeholder="exemplo@email.com">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="atleta-plano">Plano*</label>
+                                    <select id="atleta-plano" required>
+                                        <option value="Mensal">Mensal</option>
+                                        <option value="Trimestral">Trimestral</option>
+                                        <option value="Semestral">Semestral</option>
+                                        <option value="Anual">Anual</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="atleta-valor">Valor do Plano (KZ)*</label>
+                                    <input type="number" id="atleta-valor" min="0" step="1000" value="10000" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="atleta-vencimento">Data de Vencimento*</label>
+                            <input type="date" id="atleta-vencimento" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="atleta-observacoes">Observações</label>
+                            <textarea id="atleta-observacoes" rows="3" placeholder="Informações adicionais..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">💾 Cadastrar Atleta</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="lista-atletas-page" class="page hidden">
+                <div class="card">
+                    <div class="card-header">👥 Lista de Atletas</div>
+                    
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="filtro-nome">🔍 Filtrar por nome</label>
+                                <input type="text" id="filtro-nome" placeholder="Digite o nome...">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="filtro-status">Status</label>
+                                <select id="filtro-status">
+                                    <option value="Todos">Todos</option>
+                                    <option value="ativo">Ativo</option>
+                                    <option value="alerta">Alerta</option>
+                                    <option value="vencido">Vencido</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="atletas-table-container">
+                        <table id="atletas-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Telefone</th>
+                                    <th>Email</th>
+                                    <th>Plano</th>
+                                    <th>Valor</th>
+                                    <th>Vencimento</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="atletas-table-body">
+                                <!-- Dados serão preenchidos via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="card" id="editar-atleta-card" style="display: none;">
+                    <div class="card-header">✏️ Editar Atleta</div>
+                    <form id="form-editar-atleta">
+                        <input type="hidden" id="editar-atleta-id">
+                        
+                        <div class="form-group">
+                            <label for="editar-nome">Nome</label>
+                            <input type="text" id="editar-nome" required>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="editar-telefone">Telefone</label>
+                                    <input type="text" id="editar-telefone">
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="editar-email">Email</label>
+                                    <input type="email" id="editar-email">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="editar-plano">Plano</label>
+                                    <select id="editar-plano" required>
+                                        <option value="Mensal">Mensal</option>
+                                        <option value="Trimestral">Trimestral</option>
+                                        <option value="Semestral">Semestral</option>
+                                        <option value="Anual">Anual</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="editar-valor">Valor</label>
+                                    <input type="number" id="editar-valor" min="0" step="1000" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="editar-vencimento">Vencimento</label>
+                            <input type="date" id="editar-vencimento" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="editar-observacoes">Observações</label>
+                            <textarea id="editar-observacoes" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col">
+                                <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Atualizar</button>
+                            </div>
+                            <div class="col">
+                                <button type="button" id="btn-excluir-atleta" class="btn btn-danger" style="width: 100%;">🗑️ Excluir</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="pagamentos-page" class="page hidden">
+                <div class="tabs">
+                    <div class="tab active" data-tab="registrar-pagamento">💳 Registrar Pagamento</div>
+                    <div class="tab" data-tab="historico-pagamentos">📋 Histórico</div>
+                </div>
+                
+                <div id="registrar-pagamento" class="tab-content active">
+                    <div class="card">
+                        <div class="card-header">💳 Registrar Pagamento</div>
+                        <form id="form-registrar-pagamento">
+                            <div class="form-group">
+                                <label for="pagamento-atleta">Atleta*</label>
+                                <select id="pagamento-atleta" required>
+                                    <!-- Opções preenchidas via JavaScript -->
+                                </select>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label for="pagamento-valor">Valor (KZ)*</label>
+                                        <input type="number" id="pagamento-valor" min="0" step="1000" value="10000" required>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label for="pagamento-forma">Forma de Pagamento*</label>
+                                        <select id="pagamento-forma" required>
+                                            <option value="Dinheiro">Dinheiro</option>
+                                            <option value="Transferência">Transferência</option>
+                                            <option value="Cartão">Cartão</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label for="pagamento-data">Data*</label>
+                                        <input type="date" id="pagamento-data" required>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label for="pagamento-mes">Mês Referência*</label>
+                                        <input type="month" id="pagamento-mes" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="pagamento-observacoes">Observações</label>
+                                <textarea id="pagamento-observacoes" rows="3"></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">💾 Registrar</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div id="historico-pagamentos" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">📋 Histórico de Pagamentos</div>
+                        <table id="pagamentos-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Atleta</th>
+                                    <th>Data</th>
+                                    <th>Valor</th>
+                                    <th>Mês Referência</th>
+                                    <th>Forma</th>
+                                    <th>Observações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pagamentos-table-body">
+                                <!-- Dados preenchidos via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="relatorios-page" class="page hidden">
+                <div class="card">
+                    <div class="card-header">📊 Relatórios Financeiros</div>
+                    
+                    <div class="kpi-container">
+                        <div class="kpi-card">
+                            <div class="kpi-label">💰 Receita Mês</div>
+                            <div class="kpi-value" id="relatorio-receita">KZ 0,00</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">👥 Total Atletas</div>
+                            <div class="kpi-value" id="relatorio-total">0</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">💵 Ticket Médio</div>
+                            <div class="kpi-value" id="relatorio-ticket">KZ 0,00</div>
+                        </div>
+                    </div>
+                    
+                    <div id="chart-relatorios-container">
+                        <canvas id="relatorios-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div id="configuracoes-page" class="page hidden">
+                <div class="card">
+                    <div class="card-header">⚙️ Configurações</div>
+                    
+                    <div class="form-group">
+                        <label for="meta-receita">Meta de Receita Mensal (KZ)</label>
+                        <input type="number" id="meta-receita" min="0" step="10000">
+                    </div>
+                    
+                    <button id="btn-salvar-meta" class="btn btn-primary">💾 Salvar Meta</button>
+                </div>
+            </div>
+
+            <div id="perfil-page" class="page hidden">
+                <div class="card">
+                    <div class="card-header">👤 Meu Perfil</div>
+                    
+                    <div id="perfil-info" class="alert alert-info">
+                        <!-- Informações do usuário -->
+                    </div>
+                    
+                    <button id="btn-logout" class="btn btn-danger">🚪 Sair</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
